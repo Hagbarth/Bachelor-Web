@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RandersControlCenter</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"><!-- Angular does some things with CSS so it's good to load this in the head -->
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/bootstrap-timepicker.min.css" type="text/css"/>
+    <link rel="stylesheet" href="css/datepicker.css" type="text/css"/>
+    <link rel="stylesheet" href="css/jquery.gritter.css" type="text/css"/>
+
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/lib/bootstrap-timepicker.min.js"></script>
+	<script type="text/javascript" src="js/lib/bootstrap-datepicker.js"></script>
+	<script type="text/javascript" src="js/lib/moment-with-langs.min.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.gritter.min.js"></script>
+	
+
+<style>
+.container {
+    width:80%;
+}
+#list table{
+	width: 100%;
+}
+
+</style>
+</head>
+ 
+<body>
+<div class="container">
+	<div class="row">
+		<div id="list" class="span9">
+			<h2>Aktiviteter</h2>
+			<table id="feedingList" class="table table-striped ">
+			</table>
+		</div>
+		
+		<div id="add" class="span3">
+			<h2>Tilføj aktivitet</h2>
+			Type:
+			<select id="typeSelect">
+			  <option value="Fodring">Fodring</option>
+			  <option value="Fremvisning">Fremvisning</option>
+			  <option value="Andet">Andet</option>
+			</select>
+			<br />
+			Dyr:
+			<select id="animalSelect">
+			  <option>Loading dyr..</option>
+			</select>
+			<br />
+			Sted:
+			<select id="placeSelect">
+			  <option>Loading place..</option>
+			</select>
+			<br />
+			Dato:
+			<br />
+			<div class="input-append date" data-date="12-02-2012" data-date-format="dd-mm-yyyy">
+			  <input class="span2" id="feedingDate" size="16" type="text" >
+			  <span class="add-on"><i class="fa fa-calendar"></i></span>
+			</div>
+			<br />
+			Tid:
+			<br />
+			<div class="input-append bootstrap-timepicker ">
+		        <input id="timepicker" type="text" class="span2">
+		        <span class="add-on"><i class="fa fa-clock-o"></i></span>
+		    </div>
+		    <br />
+		    Beskrivelse:
+		    <br />
+		    <textarea id="description" style="height:200px; width:385px;"></textarea>
+		    <br />
+		    <input type="button" class="btn btn-info" id="addFeeding" value="Tilføj aktivitet" style="width:400px;"/>
+		</div>
+	</div>
+</div>
+<script>
+$(function(){
+	/************************************************************
+	*	feedding list											*
+	************************************************************/
+	
+	feedingList();
+	
+
+	/************************************************************
+	*	load data, to actions									*
+	************************************************************/
+	
+	loadingAnimals();
+	
+	loadingPlaces();
+	
+	$('#timepicker').timepicker({
+        minuteStep: 15,
+        weekStart : 1,
+        defaltTime: 'current',
+        showMeridian: false,
+    });
+    
+    date = moment(new Date);
+	$('.date').datepicker({
+		format: 'dd/mm/yyyy',
+		setDate: date
+	});
+	$('#feedingDate').val(date.format('DD/MM/YYYY'));
+	
+	$(document).on("click", "#addFeeding", function() {
+	    $.ajax({
+			url: 'backend/?path=feedings',
+			type: 'POST',
+			data :{
+				animalID: $('#animalSelect').val(),
+				description: $('#description').val(),
+				placeID: $('#placeSelect').val(), 
+				time: $('#feedingDate').val()+' '+$('#timepicker').val(),
+				type: $('#typeSelect').val()
+				
+			},
+			success: function(data){
+				if(data.success){
+					feedingList();
+					$.gritter.add({
+						title: 'Tilføjet!',
+						text: 'Aktiviteten er tilføjet.'
+					});
+				}
+			}
+		});
+    });
+ 
+});
+
+/************************************************************
+*	Functions												*
+************************************************************/
+function feedingList(){
+	$.ajax({
+		url: 'backend/?path=feedings',
+		type: 'GET',
+		dataType: 'jsonp',
+		contentType: 'application/json; charset=utf-8',
+		success: function(data){
+			$('#feedingList').empty();
+			$('#feedingList').append('<tr><th>Type</th><th>Dyr</th><th>Sted</th><th>Beskrivelse</th><th>Tid</th><th></th></tr>')
+			$.each(data.feedings, function(index, feeding){
+				time = moment(feeding.time);
+				if(moment(time).isAfter(new Date)){
+					$('#feedingList').append('<tr><td>'+feeding.type+'</td><td>'+feeding.animal.name+'</td><td>'+feeding.place.name+'</td><td>'+feeding.description+'</td><td>'+time.format('DD/MM/YY HH:mm')+'</td><td><button class="btn btn-mini btn-danger" onclick="deleteFeeding('+feeding.id+')"><i class="fa fa-trash-o"></i></button></td></tr>');
+				}
+			});	
+		}
+	});
+}
+
+function loadingAnimals(){
+	$.ajax({
+		url: 'backend/?path=animals',
+		type: 'GET',
+		dataType: 'jsonp',
+		contentType: 'application/json; charset=utf-8',
+		success: function(data){
+			$('#animalSelect').empty();
+			$.each(data.animals, function(index, animal){
+				$('#animalSelect').append('<option value="'+animal.id+'">'+animal.name+'</option>');
+			});	
+		}
+	});
+}
+
+function loadingPlaces(){
+	$.ajax({
+		url: 'backend/?path=places',
+		type: 'GET',
+		dataType: 'jsonp',
+		contentType: 'application/json; charset=utf-8',
+		success: function(data){
+			$('#placeSelect').empty();
+			$.each(data.places, function(index, place){
+				$('#placeSelect').append('<option value="'+place.id+'">'+place.name+'</option>');
+			});
+		}
+	});
+}
+
+function deleteFeeding(feedingID){
+	    $.ajax({
+			url: 'backend/?path=feedings/delete',
+			type: 'POST',
+			data :{
+				id: feedingID
+			},
+			success: function(data){
+				if(data.success){
+					feedingList();
+					$.gritter.add({
+						title: 'Delete!',
+						text: 'Aktiviteten er fjerne.'
+					});	
+				}
+			}
+		});
+    }
+</script>
+
+</body>
+</html>
