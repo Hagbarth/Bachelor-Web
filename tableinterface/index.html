@@ -1,0 +1,332 @@
+<html>
+<head>
+	<title>
+		Table interface
+	</title>
+	<link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+	<link rel="stylesheet" href="../css/font-awesome.min.css" type="text/css">
+	<link rel="stylesheet" href="../css/bootstrap-timepicker.min.css" type="text/css"/>
+	<style>
+		body{
+			background: #000;
+			font-family: helvetica;
+		}
+		#america{
+			height: 623px;
+			width: 623px;
+			top: 55px;
+			left: 1px;
+			position: fixed;
+		}
+		.dome-img{
+			position: absolute;
+		    z-index: -1;
+		    width: 100%;
+		    top: 0;
+		    left: 0;
+		}
+		#africa{
+			height: 397px;
+			width: 397px;
+			top: -33px;
+			left: 585px;
+			position: fixed;
+		}
+		#asia{
+			height: 452px;
+			width: 452px;
+			top: 297px;
+			left: 779px;
+			position: fixed;
+		}
+		#aqua{
+			width: 300px;
+			bottom: 0px;
+			left: 400px;
+			position: fixed;
+		}
+		#feeding1{
+			padding: 3px;
+			background: rgba(255,0,0,0.1);
+			border-radius: 90;
+			-webkit-animation: anmtn-feed 3s infinite;
+			top: 650px;
+			right: 300px;
+			position: fixed;
+			z-index: 9999;
+		}
+		#clock{
+			color: white;
+		}
+		#feed-table{
+			color: white;
+		}
+		
+		.animation-container{
+			width: 100%;
+			height: 100%;
+			position: relative;
+		}
+		
+		.seacow{
+			width: 100px;
+			position: absolute;
+			right: 170;
+			bottom: 210;
+		}
+		
+		.feed-dot{
+			width: 20px;
+			height: 20px;
+			background: red;
+			border-radius: 90;
+		}
+		
+		.feed-surround-dot{
+			padding: 3px;
+			background: rgba(255,0,0,0.1);
+			border-radius: 90;
+			-webkit-animation: anmtn-feed 3s infinite;
+		}
+		
+		.title{
+			position: absolute;
+			margin-left: -20px;
+			margin-top: -20px;
+			opacity: 0.6;
+		}
+		
+		@-webkit-keyframes anmtn-feed /* Safari and Chrome */
+		{
+		0% {background: rgba(255,0,0,0.1);}
+		50% {background: rgba(255,0,0,0.5);}
+		100% {background: rgba(255,0,0,0.1);}
+		}
+		
+		.title-thingy{
+			z-index: 999;
+			width: 400px;
+			position: fixed;
+		}
+		.lilledreng{
+			right: 0;
+			position: fixed;
+			bottom: 0;
+			width: 200px;
+		}	
+		.americaTitle{
+			color: yellow;
+			position: fixed;
+			right: 190px;
+			font-size: 30pt;
+			text-transform: uppercase;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<!--Info-->
+	<div id="info">
+		<!-- Clock -->
+		<div id="clock">
+			<span id="hour"></span>
+			:
+			<span id="minute"></span>
+		</div>	
+		<!-- /Clock -->
+		<!--Feeding Descriptions-->
+		<table id="feed-table"></table>
+		<!--/Feeding Descriptions-->
+	</div>
+	<!--/Info-->
+	
+	<!-- Areas -->
+	<div id="areas">
+		<!-- South America -->
+		<div id="america">
+			<img src="southamerica.png" class="dome-img" alt="" />
+			<div class="animation-container">
+				<img src="../resources/images/animated/animals/seacow.gif" class="seacow" id="seacow-1" alt="seacow">
+			</div>
+		</div>
+		<!-- /South America -->
+		
+		<!-- Africa -->
+		<div id="africa">
+			<img src="africa.png" class="dome-img" alt="" />
+		</div>
+		<!-- /Africa -->
+		
+		<div id="asia">
+			<img src="asia.png" class="dome-img" alt="" />
+		</div>		-->
+		<!-- /Asia -->
+	</div>
+	<!-- /Areas -->
+	
+<!--	<img src="title-thingy.png" class="title-thingy" alt="" />-->
+<!--	<img src="lilledreng.png" class="lilledreng" alt="" />-->
+	
+	<!-- Scripts -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="http://momentjs.com/downloads/moment-with-langs.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../js/lib/bootstrap-timepicker.min.js"></script>
+	<script type="text/javascript" src="../js/greensock/TweenMax.min.js"></script>
+	<script type="text/javascript">
+	
+		//Variables
+		var time = moment(),
+		clock = $("#clock"),
+		userInput = false,
+		upArrow = false,
+		downArrow = false,
+		
+		//Function variables
+		addFeedingToArea = function(feeding, area) {
+			var domArea = $("#" + area);
+			var place = feeding.place;
+			domArea.append('<div id="feeding-'+feeding.id+'" style="position: absolute; top: '+place.y+'; left: '+place.x+'; color: white;" class="feed-surround-dot"><div class="feed-dot"><span class="title">'+feeding.animal.name+'</span></div></div>');
+		},
+		
+		updateFeedings = function(time) {
+			$.ajax({
+				url: '../backend/?path=feedings/atTime/' + time.format("YYYY-MM-DD HH:mm:ss").replace(" ", "%20"),
+				type: 'GET',
+				dataType: "jsonp",
+				jsonpCallback: "feedingsCallback"
+			});	
+		},
+		
+		updateTime = function(moment_instance) {
+			var format = "YYYY-MM-DD HH:mm";
+			if (moment_instance) {
+				time = moment_instance;
+			} else {
+				time = moment();
+			}
+			clock.clock(time);
+			updateFeedings(time);
+		},
+		
+		feedingsCallback = function(json) {
+			if (json.error) {
+				alert(json.error);
+			} else {
+				var feedings = json.feedings;
+				$(".feed-surround-dot").remove();
+				$("#feed-table").empty();
+				if (feedings) {
+					$.each(feedings, function(index, feeding){
+					
+						//Add feedings to area
+						var areaID;
+						switch (feeding.place.areaID) {
+							case 1 :
+								areaID = "america";
+								break;			
+						}
+						if (areaID) addFeedingToArea(feeding, areaID);
+						
+						//Add descriptions to table
+						var feedingTime = moment(feeding.time).format("HH:mm:ss");
+						$("#feed-table").append('<tr><td>'+ feeding.animal.name +' fodres kl.'+ feedingTime +'</td></tr>');
+					});
+				}
+			}	
+		},
+		
+		spoolTime = function() {
+			if (upArrow) {
+				time.add('minutes', 1);
+				updateTime(time);
+			}
+			if (downArrow) {
+				time.subtract('minutes', 1);
+				updateTime(time);
+			}
+		};
+									
+		//Jquery functions
+		$.fn.clock = function(moment_instance) {
+			var hour = $(this).find("#hour"),
+			minute = $(this).find("#minute");	
+			hour.html(moment_instance.format("HH"));
+			minute.html(moment_instance.format("mm"));
+		}	
+		
+		$.fn.animalAnimate = function() {
+			var animal = $(this);
+			
+			var bPath = {
+				curviness: 1.5, 
+				values: [
+					{right:150, bottom:200},
+					{right:170, bottom:150},
+					{right:180, bottom:130},
+					{right:180, bottom:110},
+					]
+				};
+			
+			TweenMax.to(animal, 5, {
+				zIndex: 0,
+				bezier: bPath,
+				onComplete: function() {
+					TweenMax.to(animal, 2, {rotation:-130, onComplete: function() {
+						var bPath = {
+							curviness: 1.5, 
+							values: [
+								{right:180, bottom:110},
+								{right:180, bottom:130},
+								{right:170, bottom:150},
+								{right:150, bottom:200},
+								]
+							};
+					
+						TweenMax.to(animal, 5, {
+							zIndex: 0,
+							bezier: bPath,
+							onComplete: function() {
+								TweenMax.to(animal, 2, {rotation:0, onComplete: function() {
+									animal.animalAnimate();
+								}});
+							}
+						});
+					}});
+				}
+			});
+			
+		
+		}	
+		
+		$("#seacow-1").animalAnimate();
+	
+		//Listeners
+		$(document).keydown(function(e){
+			switch (e.keyCode) {
+				case 222:
+					userInput = true;
+					downArrow = false;		
+					upArrow = true;
+					spoolTime();
+					break;
+				case 219:
+					userInput = true;
+					upArrow = false;
+					downArrow = true;	
+					spoolTime();
+			}
+		}).keyup(function(){
+			downArrow = false;		
+			upArrow = false;
+			setTimeout(function(){userInput = false;},30000);
+		});	
+		
+		//Intervals
+		updateTime(moment());
+		setInterval(function(){
+			if (!userInput) updateTime();
+		}, 60000);
+	</script>
+	<!-- /Scripts -->
+</body>
+</html>
