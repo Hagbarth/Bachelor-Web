@@ -11,6 +11,7 @@
 			background: #000;
 			font-family: helvetica;
 		}
+		
 		#america{
 			height: 623px;
 			width: 623px;
@@ -18,13 +19,7 @@
 			left: 1px;
 			position: fixed;
 		}
-		.dome-img{
-			position: absolute;
-		    z-index: -1;
-		    width: 100%;
-		    top: 0;
-		    left: 0;
-		}
+				
 		#africa{
 			height: 397px;
 			width: 397px;
@@ -32,6 +27,7 @@
 			left: 585px;
 			position: fixed;
 		}
+		
 		#asia{
 			height: 452px;
 			width: 452px;
@@ -39,12 +35,14 @@
 			left: 779px;
 			position: fixed;
 		}
+		
 		#aqua{
 			width: 300px;
 			bottom: 0px;
 			left: 400px;
 			position: fixed;
 		}
+		
 		#feeding1{
 			padding: 3px;
 			background: rgba(255,0,0,0.1);
@@ -54,10 +52,23 @@
 			right: 300px;
 			position: fixed;
 			z-index: 9999;
+			text-align: center;
+		}		
+		
+		#info{
+			color: #fff;
+			width: 258px;
+			height: 158px;
+			position: fixed;
+			top: 540px;
+			left: 545px;
+			z-index: 99;
 		}
+		
 		#clock{
-			color: white;
+			text-align: center;
 		}
+		
 		#feed-table{
 			color: white;
 		}
@@ -89,18 +100,19 @@
 			-webkit-animation: anmtn-feed 3s infinite;
 		}
 		
+		.dome-img{
+			position: absolute;
+		    z-index: -1;
+		    width: 100%;
+		    top: 0;
+		    left: 0;
+		}
+
 		.title{
 			position: absolute;
 			margin-left: -20px;
 			margin-top: -20px;
 			opacity: 0.6;
-		}
-		
-		@-webkit-keyframes anmtn-feed /* Safari and Chrome */
-		{
-		0% {background: rgba(255,0,0,0.1);}
-		50% {background: rgba(255,0,0,0.5);}
-		100% {background: rgba(255,0,0,0.1);}
 		}
 		
 		.title-thingy{
@@ -122,13 +134,12 @@
 			text-transform: uppercase;
 			font-weight: bold;
 		}
-		#info{
-			color: #fff;
-			width: 258px;
-			height: 158px;
-			position: fixed;
-			top:526px;
-			left:512px;
+
+		
+		@-webkit-keyframes anmtn-feed { /* Safari and Chrome */
+			0% {background: rgba(255,0,0,0.1);}
+			50% {background: rgba(255,0,0,0.5);}
+			100% {background: rgba(255,0,0,0.1);}
 		}
 	</style>
 </head>
@@ -137,9 +148,11 @@
 	<div id="info">
 		<!-- Clock -->
 		<div id="clock">
-			<span id="hour"></span>
-			:
-			<span id="minute"></span>
+			<p>
+				<span id="hour"></span>
+				:
+				<span id="minute"></span>
+			</p>
 		</div>	
 		<!-- /Clock -->
 		<!--Feeding Descriptions-->
@@ -191,10 +204,10 @@
 		downArrow = false,
 		
 		//Function variables
-		addFeedingToArea = function(feeding, area) {
+		addFeedingToArea = function(feeding, area, color) {
 			var domArea = $("#" + area);
 			var place = feeding.place;
-			domArea.append('<div id="feeding-'+feeding.id+'" style="position: absolute; top: '+place.y+'; left: '+place.x+'; color: white;" class="feed-surround-dot"><div class="feed-dot"><span class="title">'+feeding.animal.name+'</span></div></div>');
+			domArea.append('<div id="feeding-'+feeding.id+'" style="position: absolute; top: '+place.y+'; left: '+place.x+'; color: white;" class="feed-surround-dot"><div class="feed-dot" style="background-color: '+ color +'"></div></div>');
 		},
 		
 		updateFeedings = function(time) {
@@ -221,6 +234,7 @@
 			if (json.error) {
 				alert(json.error);
 			} else {
+				console.log(json);
 				var feedings = json.feedings;
 				$(".feed-surround-dot").remove();
 				$("#feed-table").empty();
@@ -236,12 +250,35 @@
 							case 2 : 
 								areaID = "africa";
 								 break;		
+							case 3 :
+								areaID = "asia";
+								break;
 						}
-						if (areaID) addFeedingToArea(feeding, areaID);
+						
+						var color;
+						switch (index) {
+							case 0 :
+								color = "red";
+								break;	
+							case 1 : 
+								color = "blue";
+								break;		
+							case 2 : 
+								color = "green";
+								break;		
+							case 3 : 
+								color = "purple";
+								break;		
+							case 4 : 
+								color = "orange";
+								break;		
+						}
+						
+						if (areaID) addFeedingToArea(feeding, areaID, color);
 						
 						//Add descriptions to table
 						var feedingTime = moment(feeding.time).format("HH:mm:ss");
-						$("#feed-table").append('<tr><td>'+ feeding.animal.name +' fodres kl.'+ feedingTime +'</td></tr>');
+						$("#feed-table").append('<tr><td><div class="feed-dot" style="display: inline-block; width: 8px; height: 8px; background-color: '+ color +'"></div> '+ feeding.animal.name +' fodres kl.'+ feedingTime +'</td></tr>');
 					});
 				}
 			}	
