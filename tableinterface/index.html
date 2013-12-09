@@ -150,7 +150,7 @@
 </head>
 <body>
 	<!--Info-->
-	<div id="info">
+	<div id="info" class="moveable">
 		<!-- Clock -->
 		<div id="clock">
 			<h1>
@@ -169,7 +169,7 @@
 	<!-- Areas -->
 	<div id="areas">
 		<!-- South America -->
-		<div id="america">
+		<div id="america" class="moveable">
 			<img src="southamerica.png" class="dome-img" alt="" />
 			<div class="animation-container">
 				<img src="../resources/images/animated/animals/seacow.gif" class="seacow" id="seacow-1" alt="seacow">
@@ -178,12 +178,12 @@
 		<!-- /South America -->
 		
 		<!-- Africa -->
-		<div id="africa">
+		<div id="africa" class="moveable">
 			<img src="africa.png" class="dome-img" alt="" />
 		</div>
 		<!-- /Africa -->
 		
-		<div id="asia">
+		<div id="asia" class="moveable">
 			<img src="asia.png" class="dome-img" alt="" />
 		</div>		-->
 		<!-- /Asia -->
@@ -217,6 +217,7 @@
 		},
 		
 		updateFeedings = function(time) {
+			console.log('../backend/?path=feedings/atTime/' + time.format("YYYY-MM-DD HH:mm:ss").replace(" ", "%20"));
 			$.ajax({
 				url: '../backend/?path=feedings/atTime/' + time.format("YYYY-MM-DD HH:mm:ss").replace(" ", "%20"),
 				type: 'GET',
@@ -237,6 +238,7 @@
 		},
 		
 		feedingsCallback = function(json) {
+			console.log(json);
 			if (json.error) {
 				alert(json.error);
 			} else {
@@ -393,6 +395,9 @@
 		
 		//Init oprations
 		updateTime(moment());
+		$(".moveable").each(function(index, element){
+			$(element).movable();
+		});
 	</script>
 	<!-- /Scripts -->
 </body>
