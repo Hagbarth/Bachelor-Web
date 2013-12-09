@@ -60,7 +60,7 @@
 			width: 258px;
 			height: 158px;
 			position: fixed;
-			top: 540px;
+			top: 520px;
 			left: 545px;
 			z-index: 99;
 		}
@@ -71,6 +71,11 @@
 		
 		#feed-table{
 			color: white;
+		}
+		
+		#colon{
+			margin-left: -10px;
+			margin-right: -10px;
 		}
 		
 		.animation-container{
@@ -148,11 +153,11 @@
 	<div id="info">
 		<!-- Clock -->
 		<div id="clock">
-			<p>
+			<h1>
 				<span id="hour"></span>
-				:
+				<span id="colon">:</span>
 				<span id="minute"></span>
-			</p>
+			</h1>
 		</div>	
 		<!-- /Clock -->
 		<!--Feeding Descriptions-->
@@ -202,6 +207,7 @@
 		userInput = false,
 		upArrow = false,
 		downArrow = false,
+		clockColonShown = true,
 		
 		//Function variables
 		addFeedingToArea = function(feeding, area, color) {
@@ -277,7 +283,8 @@
 						
 						//Add descriptions to table
 						var feedingTime = moment(feeding.time).format("HH:mm:ss");
-						$("#feed-table").append('<tr><td><div class="feed-dot" style="display: inline-block; width: 8px; height: 8px; background-color: '+ color +'"></div> '+ feeding.animal.name +' fodres kl.'+ feedingTime +'</td></tr>');
+						var animalStr = feeding.animal.name == "Ikke angivet" ? "" : " af " + feeding.animal.name;
+						$("#feed-table").append('<tr><td><div class="feed-dot" style="display: inline-block; width: 8px; height: 8px; background-color: '+ color +'"></div> '+ feeding.type + animalStr +' kl.'+ feedingTime +'</td></tr>');
 					});
 				}
 			}	
@@ -370,10 +377,22 @@
 		});	
 		
 		//Intervals
-		updateTime(moment());
 		setInterval(function(){
 			if (!userInput) updateTime();
 		}, 60000);	
+		
+		setInterval(function(){
+			if (clockColonShown) {
+				$("#colon").css("visibility", "hidden");
+				clockColonShown = false;
+			} else {
+				$("#colon").removeAttr("style");
+				clockColonShown = true;
+			}
+		}, 1000);
+		
+		//Init oprations
+		updateTime(moment());
 	</script>
 	<!-- /Scripts -->
 </body>
