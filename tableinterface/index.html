@@ -19,6 +19,12 @@
 			left: 1px;
 			position: fixed;
 		}
+		
+		#america-text{
+			top: 630px;
+			left: 250px;
+			position: fixed;
+		}
 				
 		#africa{
 			height: 397px;
@@ -27,12 +33,23 @@
 			left: 585px;
 			position: fixed;
 		}
+		#africa-text{
+			top: 0px;
+			left: 1000px;
+			position: fixed;
+		}
 		
 		#asia{
 			height: 452px;
 			width: 452px;
 			top: 297px;
 			left: 779px;
+			position: fixed;
+		}
+		
+		#asia-text{
+			top: 670px;
+			left: 1120px;
 			position: fixed;
 		}
 		
@@ -71,6 +88,10 @@
 		
 		#feed-table{
 			color: white;
+		}
+		
+		.text{
+			height: 100px;
 		}
 		
 		#colon{
@@ -185,18 +206,24 @@
 				<img src="../resources/images/animated/animals/seacow.gif" class="seacow" id="seacow-1" alt="seacow">
 				<img src="../resources/images/animated/animals/seacow.gif" class="seacow" id="seacow-2" alt="seacow">
 			</div>
+			
 		</div>
+		<img src="text_america.png" class="text moveable" id="america-text" />
+
 		<!-- /South America -->
 		
 		<!-- Africa -->
 		<div id="africa" class="moveable">
 			<img src="africa.png" class="dome-img" alt="" />
 		</div>
+		<img src="text_africa.png" class="text moveable" id="africa-text" />
+
 		<!-- /Africa -->
 		
 		<div id="asia" class="moveable">
 			<img src="asia.png" class="dome-img" alt="" />
-		</div>		-->
+		</div>
+		<img src="text_asia.png" class="text moveable" id="asia-text" />
 		<!-- /Asia -->
 	</div>
 	<!-- /Areas -->
